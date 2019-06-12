@@ -6,6 +6,7 @@ This work was designed to apply our Expectation Reflection method for data class
 
 Table of Contents
 -----------------------
+.. role:: raw-html(raw) :format: html
 Predictive Model
 `Synthetic Data <https://github.com/danhtaihoang/expectation-reflection/blob/master/syntheticdata.ipynb>`_
 `Diabetes Diagnosis <https://github.com/danhtaihoang/expectation-reflection/blob/master/diabetes.ipynb>`_
