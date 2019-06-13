@@ -7,7 +7,7 @@ fit h0 and w based on Expectation Reflection
 input: features x[l,n], target: y[l]
  output: h0, w[n]
 """
-def fit(x,y,niter_max=500,regu=0.0):
+def fit(x,y,niter_max=100,regu=0.0):
     #print(niter_max)    
 
     n = x.shape[1]
