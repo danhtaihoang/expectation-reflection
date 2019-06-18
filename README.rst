@@ -14,3 +14,5 @@ Predictive Model
 `Breast Cancer Diagnosis <https://github.com/danhtaihoang/expectation-reflection/blob/master/breastcancer.ipynb>`_
 
 `Heart Disease Diagnosis <https://github.com/danhtaihoang/expectation-reflection/blob/master/heartdisease.ipynb>`_
+
+`Prediction of HIV-1 protease cleavage sites <https://github.com/danhtaihoang/expectation-reflection/blob/master/hiv_protease.ipynb>`_
