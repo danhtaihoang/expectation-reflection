@@ -1,18 +1,29 @@
-Expectation Reflection for Classification
+Expectation Reflection for Data Classification
 ======================================================
 
-This work was designed to apply our Expectation Reflection method for data classification. We compare the performance of our approach with the state-of-the-art methods such as Logistic Regression, Naive Bayes, Random Forest and Decision Tree.
+This work was designed to apply our Expectation Reflection method for data classification. We compare the performance of our approach with the state-of-the-art methods such as Logistic Regression, Naive Bayes, and Random Forest.
 
 Table of Contents
 -----------------------
-Predictive Model
+Method
 
-`Synthetic Data <https://github.com/danhtaihoang/expectation-reflection/blob/master/syntheticdata.ipynb>`_
+`Kidney Disease <https://github.com/danhtaihoang/expectation-reflection/blob/master/kidney.ipynb>`_
 
-`Diabetes Diagnosis <https://github.com/danhtaihoang/expectation-reflection/blob/master/diabetes.ipynb>`_
+`Breast Cancer <https://github.com/danhtaihoang/expectation-reflection/blob/master/breastcancer.ipynb>`_
 
-`Breast Cancer Diagnosis <https://github.com/danhtaihoang/expectation-reflection/blob/master/breastcancer.ipynb>`_
+`Diabetes <https://github.com/danhtaihoang/expectation-reflection/blob/master/diabetes.ipynb>`_
 
-`Heart Disease Diagnosis <https://github.com/danhtaihoang/expectation-reflection/blob/master/heartdisease.ipynb>`_
+`Diabetic Retinopathy <https://github.com/danhtaihoang/expectation-reflection/blob/master/diabetic_retinopathy.ipynb>`_
 
-`Prediction of HIV-1 protease cleavage sites <https://github.com/danhtaihoang/expectation-reflection/blob/master/hiv_protease.ipynb>`_
+`Orthopedic <https://github.com/danhtaihoang/expectation-reflection/blob/master/orthopedic.ipynb>`_
+
+`Breast Tissue <https://github.com/danhtaihoang/expectation-reflection/blob/master/breast_tissue.ipynb>`_
+
+`Protein Expression <https://github.com/danhtaihoang/expectation-reflection/blob/master/protein.ipynb>`_
+
+`Gene Sequence <https://github.com/danhtaihoang/expectation-reflection/blob/master/gene.ipynb>`_
+
+`Cardiotocography <https://github.com/danhtaihoang/expectation-reflection/blob/master/cardiotocography.ipynb>`_
+
+.. image:: performance.png
+  :width: 200
