@@ -1,0 +1,58 @@
+Metadata-Version: 2.1
+Name: expectation-reflection
+Version: 0.0.4
+Summary: Expectation Reflection for classification
+Home-page: https://github.com/danhtaihoang/expectation_reflection
+Author: Danh-Tai HOANG
+Author-email: hoangdanhtai@gmail.com
+License: MIT
+Description: Expectation Reflection (ER) is a multiplicative optimization method that trains the interaction weights from features to target according to the ratio of target observations to their corresponding model expectations. This approach completely separates model updates from minimization of a cost function measuring goodness of fit, so that this cost function can be used as the stopping criterion of the iteration. Therefore, this method has advantage in dealing with the problems of small sample sizes (but many features). Using only one hyperparameter is another benefit of this method.
+        
+        ## Installation
+        #### From PyPi
+        
+        ```bash
+        pip install expectation-reflection
+        ```
+        
+        #### From Repository
+        
+        ```bash
+        git clone https://github.com/danhtaihoang/expectation-reflection.git
+        ```
+        
+        ## Usage
+        * Import `expectation_reflection` package into python script:
+        ```python
+        from expectation_reflection import classication as ER
+        ```
+        
+        * Train the model with `(X_train, y_train)` to get the value of intercept `b` and weights `w` from features `X_train` to target `y_train`. In the binary classification task, the target needs to be formatted in form of {0, 1}:
+        ```python
+        b,w = ER.fit(X_train, y_train, iter_max, regu)
+        print('intercept:', b)
+        print('interaction weights:', w)
+        ```
+        
+        * Using the trained values of `b` and `w`, we can predict outputs `y_pred` and their probability `p_pred` of new inputs `X_test`:
+        ```python
+        y_pred,p_pred = ER.predict(X_test,b,w)
+        print('predicted output:',y_pred)
+        print('predicted probability:',p_pred)
+        ```
+        
+        ## Citation
+        
+        Please cite the following papers if you use this package in your work:
+        
+        * [Danh-Tai Hoang, Juyong Song, Vipul Periwal, and Junghyo Jo, Network inference in stochastic systems from neurons to currencies: Improved performance at small sample size, Physical Review E, 99, 023311 (2019)](https://journals.aps.org/pre/abstract/10.1103/PhysRevE.99.023311)
+        
+        * [Danh-Tai Hoang, Junghyo Jo, and Vipul Periwal, Data-driven inference of hidden nodes in networks, Physical Review E, 99, 042114 (2019)](https://journals.aps.org/pre/abstract/10.1103/PhysRevE.99.042114)
+        
+Keywords: machine learning,classification,network inference,statistics
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
