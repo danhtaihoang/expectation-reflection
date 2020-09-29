@@ -1,28 +1,31 @@
-Expectation Reflection (ER) is a multiplicative optimization method that trains the interaction weights from features to target according to the ratio of target observations to their corresponding model expectations. This approach completely separates model updates from minimization of a cost function measuring goodness of fit, so that this cost function can be used as the stopping criterion of the iteration. Therefore, this method has advantage in dealing with the problems of small sample sizes (but many features). Using only one hyper-parameter is another benefit of this method.
+Expectation Reflection (ER) is a multiplicative optimization method that trains the interaction weights from features to target according to the ratio of target observations to their corresponding model expectations. This approach completely separates model updates from minimization of a cost function measuring goodness of fit, so that it can take the cost function as an effective stopping criterion of the iteration. This method has advantage in dealing with the problems of small sample sizes (but many features). Using only one hyper-parameter and being able to demonstrate the system mechanism are additional benefits of this method.
+
+In the current version, the `classification` package can work as a binary classifier. The extension to `multiclass_classification` and `regression` will be appeared shortly.
 
 ## Installation
-#### From PyPI
+##### From PyPI
 
 ```bash
 pip install expectation-reflection
 ```
 
-#### From Repository
+##### From Repository
 
 ```bash
 git clone https://github.com/danhtaihoang/expectation-reflection.git
 ```
 
 ## Usage
+The implementation of ER is very similar to that of other classifiers in `sklearn`, bassically it consists of the following steps.
 
-* Import `expectation_reflection` package into python script:
+* Import the `expectation_reflection` package into your python script:
 ```python
-from expectation_reflection import classication as ER
+from expectation_reflection import classification as ER
 ```
 
-* Select model:
+* Select a model:
 ```python
-model = ER.model(max_iter,regu)
+model = ER.model(max_iter=100,regu=0.01,random_state=1)
 ```
 
 * Import your `dataset.txt` into python script. In the binary classification task, ER takes target of {0, 1} form:
@@ -30,13 +33,13 @@ model = ER.model(max_iter,regu)
 Xy = np.loadtxt('dataset.txt')
 ```
 
-* Select features and target from the dataset. If target is the last column then
+* Select the features and target from the dataset. If the target is the last column then
 ```python
 X, y = Xy[:,:-1], Xy[:,-1]
 
 ```
  
-* Import `train_test_split` from `sklearn` to split data into train and test sets:
+* Import `train_test_split` from `sklearn` to split data into training and test sets:
 ```python
 from sklearn.model_selection import train_test_split
 
@@ -48,7 +51,7 @@ X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.5,random_state 
 model.fit(X_train, y_train)
 ```
 
-* Predict outputs `y_pred` and their probability `p_pred` of new inputs `X_test`:
+* Predict the output class `y_pred` and its probability `p_pred` of a new dataset `X_test`:
 ```python
 y_pred = model.predict(X_test)
 print('predicted output:', y_pred)
@@ -68,7 +71,7 @@ ER has only one hyper-parameter, `regu`, which can be optimized by using `GridSe
 ```python
 from sklearn.model_selection import GridSearchCV
 
-model = ER.model(max_iter=100)
+model = ER.model(max_iter=100, random_state = 1)
 
 regu = [0.0001, 0.001, 0.01, 0.1, 0.5, 1.]
 
@@ -84,7 +87,7 @@ best_model = clf.fit(X_train, y_train)
 print('best_hyper_parameters:',best_model.best_params_)
 ```
 
-* Predict output `y_pred` and its probability `p_pred`:
+* Predict the output `y_pred` and its probability `p_pred`:
 ```python
 y_pred = best_model.best_estimator_.predict(X_test)
 print('predicted output:', y_pred)
@@ -94,7 +97,7 @@ print('predicted probability:', p_pred)
 ```
 
 ### Performance Evaluation
-We can measure the performance of model by using `metrics` from `sklearn`:
+We can measure the model performance by using `metrics` from `sklearn`:
 
 ```python
 from sklearn.metrics import accuracy_score,precision_score,recall_score,f1_score,\

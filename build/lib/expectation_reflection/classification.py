@@ -6,26 +6,28 @@ from scipy.special import erf as sperf
 
 
 class model(object):
-    def __init__(self,max_iter=100,regu=0.001):
+    def __init__(self,max_iter=100,regu=0.01,random_state=1):
+
         self.max_iter = max_iter
         self.regu = regu
+        self.random_state = random_state
+
+        #print('ini max_iter, regu, random_state:',max_iter,regu,random_state)
 
     ##======================================================================
     def fit(self,x,y):
         max_iter = self.max_iter
         regu = self.regu
-        # convert 0, 1 to -1, 1
+        random_state = self.random_state
+
+        #print('fit max_iter, regu, random_state:',max_iter,regu,random_state)
+        np.random.seed(random_state)
+
+        # convert y{0, 1} to y1{-1, 1}
         y1 = 2*y - 1.
         #print(niter_max)
         n = x.shape[1]
-	    
-	    #x_av = np.mean(x,axis=0)
-	    #dx = x - x_av
-	    #c = np.cov(dx,rowvar=False,bias=True)
-	    # 2019.07.16:  
-	    #c += regu*np.identity(n) / (2*len(y))
-	    #c_inv = linalg.pinvh(c)
-        # initial values
+
         b = 0.
         w = np.random.normal(0.0,1./np.sqrt(n),size=(n))
         cost = np.full(max_iter,100.)
@@ -42,7 +44,6 @@ class model(object):
             h[~t] = 2*y1[~t]
             # 2019.12.26:
             b,w = infer_LAD(x,h[:,np.newaxis],regu)
-            #b,w = infer_test(b,w)
 
             self.b = b
             self.w = w
@@ -50,6 +51,8 @@ class model(object):
             self.intercept_ = b
             self.coef_ = w
 
+        #print('b:',b)
+            
         return self
 
     ##=====================================================================
@@ -85,20 +88,21 @@ class model(object):
     ##======================================================================
     ## 2020.09.28    
     def get_params(self,deep = True):
-        return {"max_iter":self.max_iter, "regu": self.regu}
+        return {"max_iter":self.max_iter, "regu":self.regu,\
+         "random_state":self.random_state}
 
     def set_params(self,**parameters):
         for parameter,value in parameters.items():
             setattr(self,parameter,value)
         return self
 
-    def score(self, X, y):
+    def score(self,X,y):
         p_pred = self.predict_proba(X)
         cost = ((p_pred - y)**2).mean()
-        return (1-cost)
+        return (1-cost) # larger is better
 
 ##===========================================================================
-def infer_LAD(x, y, regu=0.1,tol=1e-8, max_iter=5000):   
+def infer_LAD(x,y,regu,tol=1e-8,max_iter=5000):   
     weights_limit = sperf(1e-10)*1e10
     
     n_sample, n_var = x.shape

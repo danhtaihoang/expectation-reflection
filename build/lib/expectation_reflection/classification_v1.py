@@ -6,7 +6,12 @@ from scipy.special import erf as sperf
 
 
 class model(object):
-    def __init__(self,max_iter=100,regu=0.01,random_state=1):
+    def __init__(self,max_iter=100,regu=1.0,random_state=1):
+
+        # standard values 
+        #if max_iter == None:     max_iter = 100
+        #if regu == None:         regu = 0.01
+        #if random_state == None: random_state = 42
 
         self.max_iter = max_iter
         self.regu = regu
@@ -20,8 +25,8 @@ class model(object):
         regu = self.regu
         random_state = self.random_state
 
-        #print('fit max_iter, regu, random_state:',max_iter,regu,random_state)
-        np.random.seed(random_state)
+        print('fit max_iter, regu, random_state:',max_iter,regu,random_state)
+        #np.random.seed(random_state)
 
         # convert y{0, 1} to y1{-1, 1}
         y1 = 2*y - 1.
@@ -51,8 +56,6 @@ class model(object):
             self.intercept_ = b
             self.coef_ = w
 
-        #print('b:',b)
-            
         return self
 
     ##=====================================================================
@@ -88,8 +91,7 @@ class model(object):
     ##======================================================================
     ## 2020.09.28    
     def get_params(self,deep = True):
-        return {"max_iter":self.max_iter, "regu":self.regu,\
-         "random_state":self.random_state}
+        return {"max_iter":self.max_iter, "regu": self.regu}
 
     def set_params(self,**parameters):
         for parameter,value in parameters.items():
