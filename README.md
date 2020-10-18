@@ -77,7 +77,7 @@ regu = [0.0001, 0.001, 0.01, 0.1, 0.5, 1.]
 
 hyper_parameters = dict(regu=regu)
 
-clf = GridSearchCV(model, hyper_parameters=regu, cv=4, iid='deprecated')
+clf = GridSearchCV(model, hyper_parameters, cv=4, n_jobs=-1, iid='deprecated')
 
 best_model = clf.fit(X_train, y_train)
 ```

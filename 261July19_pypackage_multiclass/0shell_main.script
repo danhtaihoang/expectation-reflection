@@ -1,0 +1,12 @@
+#!/bin/bash
+
+#rm *.dat
+
+for i in {0..24}
+do
+i=${i%.*}
+python 1main.py $i &
+python 1main_LR.py $i &
+done
+
+
