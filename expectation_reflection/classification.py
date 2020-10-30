@@ -212,8 +212,11 @@ class model(object):
             #cost = ((p_pred - y)**2).mean()
 
         elif classtype == 'multi': 
+            label_encoder = self.label_encoder
             onehot_encoder = self.onehot_encoder
-            y = onehot_encoder.transform(y.reshape((-1,1)))
+
+            y = label_encoder.transform(y).reshape((-1,1)) #.reshape(-1,) # y = [0,1,2,...,0] 
+            y = onehot_encoder.transform(y)
 
         p_pred = self.predict_proba(X)
         cost = ((p_pred - y)**2).mean()

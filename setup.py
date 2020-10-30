@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="expectation_reflection", # Replace with your own username
-    version="0.0.8",
+    version="0.0.9",
     author="Danh-Tai HOANG",
     author_email="hoangdanhtai@gmail.com",
     description="Expectation Reflection for classification",
