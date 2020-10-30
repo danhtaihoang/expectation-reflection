@@ -1,6 +1,6 @@
 Expectation Reflection (ER) is a multiplicative optimization method that trains the interaction weights from features to target according to the ratio of target observations to their corresponding model expectations. This approach completely separates model updates from minimization of a cost function measuring goodness of fit, so that it can take the cost function as an effective stopping criterion of the iteration. This method has advantage in dealing with the problems of small sample sizes (but many features). Using only one hyper-parameter and being able to demonstrate the system mechanism are additional benefits of this method.
 
-In the current version, the `classification` package can work as a binary classifier. The extension to `multiclass_classification` and `regression` will be appeared shortly.
+In the current version, ER `classification` can work as a binary or multinomial classifier. The extension to `regression` will be appeared shortly.
 
 ## Installation
 ##### From PyPI
@@ -28,7 +28,7 @@ from expectation_reflection import classification as ER
 model = ER.model(max_iter=100,regu=0.01,random_state=1)
 ```
 
-* Import your `dataset.txt` into python script. In the binary classification task, ER takes target of {0, 1} form:
+* Import your `dataset.txt` into python script.
 ```python
 Xy = np.loadtxt('dataset.txt')
 ```

@@ -2,8 +2,6 @@ README.md
 setup.py
 expectation_reflection/__init__.py
 expectation_reflection/classification.py
-expectation_reflection/classification_no_self.py
-expectation_reflection/classification_v1.py
 expectation_reflection/function.py
 expectation_reflection.egg-info/PKG-INFO
 expectation_reflection.egg-info/SOURCES.txt

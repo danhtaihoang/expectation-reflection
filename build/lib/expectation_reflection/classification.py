@@ -1,7 +1,8 @@
 import numpy as np
 from scipy import linalg
 from scipy.special import erf as sperf
-#from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import LabelBinarizer,LabelEncoder
+from sklearn.preprocessing import OneHotEncoder
 #from sklearn.linear_model import ElasticNet
 
 
@@ -23,35 +24,105 @@ class model(object):
         #print('fit max_iter, regu, random_state:',max_iter,regu,random_state)
         np.random.seed(random_state)
 
-        # convert y{0, 1} to y1{-1, 1}
-        y1 = 2*y - 1.
-        #print(niter_max)
-        n = x.shape[1]
 
-        b = 0.
-        w = np.random.normal(0.0,1./np.sqrt(n),size=(n))
-        cost = np.full(max_iter,100.)
-        for iloop in range(max_iter):
-            h = b + x.dot(w)
-            y1_model = np.tanh(h/2.)    
-            # stopping criterion
-            p = 1/(1+np.exp(-h))
-            cost[iloop] = ((p-y)**2).mean()
-            if iloop>0 and cost[iloop] >= cost[iloop-1]: break
-            # update local field
-            t = h!=0
-            h[t] *= y1[t]/y1_model[t]
-            h[~t] = 2*y1[~t]
-            # 2019.12.26:
-            b,w = infer_LAD(x,h[:,np.newaxis],regu)
+        n_labels = len(np.unique(y))
+        #-------------------------------------------------------------------
+        if n_labels == 2:  # binary 
+
+            # 2020.10.30: convert {yes, no} or {A, B}, etc. to {1, 0}
+            label_binarizer = LabelBinarizer().fit(y)
+            y = label_binarizer.transform(y).reshape(-1,) # y = [1,0,1,...,0] 
+
+            # convert y{0, 1} to y1{-1, 1}
+            y1 = 2*y - 1.
+            #print(niter_max)
+            n_features = x.shape[1]
+
+            b = 0.
+            w = np.random.normal(0.0,1./np.sqrt(n_features),size=(n_features))
+            cost = np.full(max_iter,100.)
+            for iloop in range(max_iter):
+                h = b + x.dot(w)
+                y1_model = np.tanh(h/2.)    
+                # stopping criterion
+                p = 1/(1+np.exp(-h))
+                cost[iloop] = ((p-y)**2).mean()
+                if iloop>0 and cost[iloop] >= cost[iloop-1]: break
+                # update local field
+                t = h!=0
+                h[t] *= y1[t]/y1_model[t]
+                h[~t] = 2*y1[~t]
+                # 2019.12.26:
+                b,w = infer_LAD(x,h[:,np.newaxis],regu)
+
 
             self.b = b
             self.w = w
             # just for output in the main script
-            self.intercept_ = b
-            self.coef_ = w
+            #self.intercept_ = b
+            #self.coef_ = w
 
-        #print('b:',b)
+            self.label_binarizer = label_binarizer
+            self.classtype = 'binary'
+        #-------------------------------------------------------------------
+        else: # multinomial
+            # 2020.10.30: convert {A,B,C} to {0,1,2}
+            label_encoder = LabelEncoder().fit(y)
+            y = label_encoder.transform(y).reshape((-1,1)) #.reshape(-1,) # y = [0,1,2,...,0] 
+
+            onehot_encoder = OneHotEncoder(sparse=False,categories='auto').fit(y)
+            y_onehot = onehot_encoder.transform(y)
+
+            #print(niter_max)        
+            n_features = x.shape[1]
+
+            b_all = np.zeros(n_labels)
+            w_all = np.zeros((n_features,n_labels))
+
+            for i in range(n_labels):
+                y = y_onehot[:,i]  # y = {0,1}
+                y1 = 2*y - 1       # y1 = {-1,1}
+                # initial values
+                b = 0.
+                w = np.random.normal(0.0,1./np.sqrt(n_features),size=(n_features))
+                
+                cost = np.full(max_iter,100.)
+                for iloop in range(max_iter):
+                    h = b + x.dot(w)
+                    y1_model = np.tanh(h/2.)    
+
+                    # stopping criterion
+                    p = 1/(1+np.exp(-h))
+
+                    cost[iloop] = ((p-y)**2).mean()
+
+                    # 2019.07.12: lost function
+                    #cost[iloop] = ((y1[:]-y1_model[:])**2).mean()
+                    #cost[iloop] = (-y[:]*np.log(p) - (1-y)*np.log(1-p)).mean()
+
+                    if iloop > 0 and cost[iloop] >= cost[iloop-1] : break
+
+                    # update local field
+                    t = h!=0    
+                    h[t] *= y1[t]/y1_model[t]
+                    h[~t] = 2*y1[~t]
+
+                    # find w from h    
+                    b,w = infer_LAD(x,h[:,np.newaxis],regu)
+
+                b_all[i] = b
+                w_all[:,i] = w
+            
+            self.b = b_all
+            self.w = w_all
+
+            self.label_encoder= label_encoder
+            self.onehot_encoder= onehot_encoder
+            self.classtype = 'multi'    
+            #return H0,W
+
+        self.intercept_ = b
+        self.coef_ = w
             
         return self
 
@@ -63,12 +134,38 @@ class model(object):
         """
         b = self.b
         w = self.w
+        classtype = self.classtype
 
-        h = b + x.dot(w)
-        p = 1./(1. + np.exp(-h))
-        y = np.sign(p-0.5) # -1, 1
-        y = (y+1)/2        # 0, 1
-        return y
+        if classtype == 'binary':
+
+            h = b + x.dot(w)
+            p = 1./(1. + np.exp(-h))
+            y = np.sign(p-0.5) # {-1, 1}
+            y = (y+1)/2        # {0, 1}
+
+            # 2020.10.30: y_inv
+            label_binarizer = self.label_binarizer
+            y_inv = label_binarizer.inverse_transform(y)
+
+        elif classtype == 'multi': 
+            """ --------------------------------------------------------------------------
+            2019.06.12: calculate probability p based on x,h0, and w
+            input: x[l,n], w[n,my], h0
+            output: p[l]
+            """
+            h = b[np.newaxis,:] + x.dot(w)
+            p = 1/(1+np.exp(-h))
+            p /= p.sum(axis=1)[:,np.newaxis]
+            y = np.argmax(p,axis=1)    # [0,1,2,2,0,...]
+
+            ## 2020.10.30: y_inv
+            label_encoder = self.label_encoder
+            y_inv = label_encoder.inverse_transform(y)
+
+        else:
+            print('Cannot define the classtype, not binary nor multi')
+
+        return y_inv
 
     ##=====================================================================
     def predict_proba(self,x):
@@ -79,9 +176,16 @@ class model(object):
         """
         b = self.b
         w = self.w
+        classtype = self.classtype
         
-        h = b + x.dot(w)
-        p = 1./(1. + np.exp(-h))        
+        if classtype == 'binary':
+            h = b + x.dot(w)
+            p = 1./(1. + np.exp(-h))
+
+        elif classtype == 'multi': 
+            h = b[np.newaxis,:] + x.dot(w)
+            p = 1/(1+np.exp(-h))
+            p /= p.sum(axis=1)[:,np.newaxis]
 
         return p
 
@@ -97,8 +201,23 @@ class model(object):
         return self
 
     def score(self,X,y):
+        classtype = self.classtype
+        
+        if classtype == 'binary':  
+            # 2020.10.30:
+            label_binarizer = self.label_binarizer
+            y = label_binarizer.transform(y).reshape(-1,) # y = [1,0,1,...,0] 
+
+            #p_pred = self.predict_proba(X)
+            #cost = ((p_pred - y)**2).mean()
+
+        elif classtype == 'multi': 
+            onehot_encoder = self.onehot_encoder
+            y = onehot_encoder.transform(y.reshape((-1,1)))
+
         p_pred = self.predict_proba(X)
         cost = ((p_pred - y)**2).mean()
+
         return (1-cost) # larger is better
 
 ##===========================================================================
